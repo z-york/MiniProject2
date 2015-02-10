@@ -17,6 +17,8 @@ module TimingGenerator (clk, rst, empty, pixelData, rd_en, blank, hsync, vsync, 
 			pixel_x <= 10'h0;
 			pixel_y <= 10'h0;
 		end
+		// This can only happen immediately after reset
+		// Since write clock is faster than read clock
 		else if ( empty ) begin
 			pixel_x <= 10'h0;
 			pixel_y <= 10'h0;
@@ -25,12 +27,15 @@ module TimingGenerator (clk, rst, empty, pixelData, rd_en, blank, hsync, vsync, 
 			pixel_x <= next_pixel_x;
 			pixel_y <= next_pixel_y;
 		end
+
 	always @(negedge clk, posedge rst)
 		if ( rst )
 			rd_en <= 0;
+		// Read data from FIFO when blank is 1
 		else 
 			rd_en <= blank;
-	
+
+	// Set pixels	
 	always @(posedge clk, posedge rst)
 		if ( rst ) begin
 			pixel_r <= 8'h0;
